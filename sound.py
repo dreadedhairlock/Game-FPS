@@ -1,5 +1,6 @@
 import pygame as py
 
+# Kelas yang menyimpan suara yang ada
 class Suara:
     def __init__(self, game):
         self.game = game
@@ -11,3 +12,5 @@ class Suara:
         self.npc_serang = py.mixer.Sound(self.path + 'npc_attack.wav')
         self.player_sakit = py.mixer.Sound(self.path + 'player_pain.wav')
         self.theme = py.mixer.music.load(self.path + 'theme.wav')
+        py.mixer.music.set_volume(0.4)
+        

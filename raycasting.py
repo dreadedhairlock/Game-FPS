@@ -2,7 +2,8 @@ import pygame as pg
 import math
 from settings import *
 
-
+# Kelas yang merender peta. Game merupakan pseudo-3d yang merender gambar 2d berdasarkan penglihatan
+# player. Gambar 2d ini dianggap 3d oleh pemain
 class Raycasting:
     def __init__(self, game):
         self.game = game
@@ -10,6 +11,7 @@ class Raycasting:
         self.objects_to_render = []
         self.textures = self.game.renderobject.wall_textures
 
+    # Objek apa yang akan dirender.
     def get_objects_to_render(self):
         self.objects_to_render = []
         for ray, values in enumerate(self.ray_casting_result):
@@ -32,6 +34,7 @@ class Raycasting:
 
             self.objects_to_render.append((depth, wall_column, wall_pos))
 
+    # Bagaimana pemain memandang dunianya
     def ray_cast(self):
         self.ray_casting_result = []
         texture_vert, texture_hor = 1, 1
@@ -43,7 +46,7 @@ class Raycasting:
             sin_a = math.sin(ray_angle)
             cos_a = math.cos(ray_angle)
 
-            # horizontals
+            # horizontal
             y_hor, dy = (y_map + 1, 1) if sin_a > 0 else (y_map - 1e-6, -1)
 
             depth_hor = (y_hor - oy) / sin_a
@@ -61,7 +64,7 @@ class Raycasting:
                 y_hor += dy
                 depth_hor += delta_depth
 
-            # verticals
+            # vertikal
             x_vert, dx = (x_map + 1, 1) if cos_a > 0 else (x_map - 1e-6, -1)
 
             depth_vert = (x_vert - ox) / cos_a
@@ -89,17 +92,18 @@ class Raycasting:
                 x_hor %= 1
                 offset = (1 - x_hor) if sin_a > 0 else x_hor
 
-            # remove fishbowl effect
+            # Hilangkan efek lenseye
             depth *= math.cos(self.game.pemain.angle - ray_angle)
 
-            # projection
+            # Proyeksi
             proj_height = JARAK_SCREEN / (depth + 0.0001)
 
-            # ray casting result
+            # Hasil raycasting
             self.ray_casting_result.append((depth, proj_height, texture, offset))
 
             ray_angle += DELTA_ANGLE
 
+    # Perbarui kelas
     def update(self):
         self.ray_cast()
         self.get_objects_to_render()

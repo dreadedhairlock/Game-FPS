@@ -11,7 +11,10 @@ from weapon import *
 from sound import *
 from pathfinding import *
 
+# Merupakan main di mana game berjalan
+
 class Game:
+    # Inisialisasi parameter game
     def __init__(self):
         py.init()
         py.mouse.set_visible(False)
@@ -23,6 +26,7 @@ class Game:
         py.time.set_timer(self.event_global, 40)
         self.new_game()
 
+    # Mulai Game Baru
     def new_game(self):
         self.peta = Peta(self)
         self.pemain = Pemain(self)
@@ -36,6 +40,7 @@ class Game:
         # self.staticsprite = ObjekSprite(self)
         # self.animatedsprite = AnimatedSprite(self)
 
+    #  Memperbarui game setiap kali berjalan
     def update(self):
         self.pemain.update()
         self.raycasting.update()
@@ -47,12 +52,14 @@ class Game:
         self.delta_time = self.clock.tick(FPS)
         py.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
+    # Membuat gambar serta tekstur game
     def draw(self):
         self.renderobject.draw()
         self.senjata.draw()
         # self.peta.draw()
         # self.pemain.draw()
 
+    # Mengecek apakah game berjalan
     def check_events(self):
         self.trigger_global = False
         for event in py.event.get():
@@ -63,6 +70,7 @@ class Game:
                 self.trigger_global = True
             self.pemain.single_fire_event(event)
 
+    # Menjalankan game
     def run(self):
         while True:
             self.check_events()

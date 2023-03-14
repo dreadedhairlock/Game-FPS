@@ -2,7 +2,7 @@ from settings import *
 import pygame as pg
 import math
 
-
+# Kelas yang menyimpan pemain
 class Pemain:
     def __init__(self, game):
         self.game = game
@@ -11,33 +11,39 @@ class Pemain:
         self.shot = False
         self.rel = 0
         self.time_prev = pg.time.get_ticks()
-        self.health = PLAYER_MAX_HEALTH
-        self.health_recovery_delay = 700
+        self.hidup= PLAYER_MAX_HEALTH
+        self.hidup_recovery_delay = 700
         self.time_prev = pg.time.get_ticks()
 
+    # Game menggunakan regenerating health. Jika pemain tidak ditembak maka hidupnya akan kembali
+    # menjadi 100
     def recover_health(self):
-        if self.check_health_recovery_delay() and self.health < PLAYER_MAX_HEALTH:
-            self.health += 1
+        if self.check_health_recovery_delay() and self.hidup< PLAYER_MAX_HEALTH:
+            self.hidup+= 1
 
+    # Berapa waktu di mana player tidak ditembak agar hidup kembali regenerate
     def check_health_recovery_delay(self):
         time_now = pg.time.get_ticks()
-        if time_now - self.time_prev > self.health_recovery_delay:
+        if time_now - self.time_prev > self.hidup_recovery_delay:
             self.time_prev = time_now
             return True
 
+    # Mengecek apakah pemain mati
     def cek_mati(self):
-        if self.health < 1:
+        if self.hidup< 1:
             self.game.renderobject.game_over()
             pg.display.flip()
             pg.time.delay(1500)
             self.game.new_game()
 
+    # Bagaimana pemain bisa mendapatakan damage
     def get_damage(self, damage):
-        self.health -= damage
+        self.hidup-= damage
         self.game.renderobject.player_damage()
         self.game.suara.player_sakit.play()
         self.cek_mati()
 
+    # Apa yang terjadi jika senjata ditembakkan
     def single_fire_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             if event.button == 1 and not self.shot and not self.game.senjata.reloading:
@@ -45,6 +51,7 @@ class Pemain:
                 self.shot = True
                 self.game.senjata.reloading = True
 
+    # Bagaimana pemain bergerak
     def movement(self):
         sin_a = math.sin(self.angle)
         cos_a = math.cos(self.angle)
@@ -75,9 +82,11 @@ class Pemain:
         #     self.angle += PLAYER_ROT_SPEED * self.game.delta_time
         self.angle %= math.tau
 
+    # Bagaimana pemain melihat dinding
     def check_wall(self, x, y):
         return (x, y) not in self.game.peta.peta_dunia
 
+    # Fungsi agar pemain tidak menembus dinding
     def check_wall_collision(self, dx, dy):
         scale = PLAYER_SIZE_SCALE / self.game.delta_time
         if self.check_wall(int(self.x + dx * scale), int(self.y)):
@@ -85,12 +94,14 @@ class Pemain:
         if self.check_wall(int(self.x), int(self.y + dy * scale)):
             self.y += dy
 
+    # Menggambarkan pemain di minimap. Ini hanya untuk tes
     def draw(self):
         pg.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
                     (self.x * 100 + WIDTH * math.cos(self.angle),
                      self.y * 100 + WIDTH * math. sin(self.angle)), 2)
         pg.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
 
+    # Fungsi untuk kontrol mouse
     def mouse_control(self):
         mx, my = pg.mouse.get_pos()
         if mx < MOUSE_BORDER_KIRI or mx > MOUSE_BORDER_KANAN:
@@ -99,11 +110,13 @@ class Pemain:
         self.rel = max(-MOUSE_MAX_REL, min(MOUSE_MAX_REL, self.rel))
         self.angle += self.rel * MOUSE_SENSITIVITY * self.game.delta_time
 
+    # Fungsi untuk memperbarui kelas
     def update(self):
         self.movement()
         self.mouse_control()
         self.recover_health()
 
+    # Fungsi untuk menyimpan posisi pemain
     @property
     def pos(self):
         return self.x, self.y

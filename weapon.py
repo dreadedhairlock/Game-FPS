@@ -1,6 +1,7 @@
 from sprite_object import *
 import pygame as py
 
+# Kelas untuk senjata diturunkan dari animatedsprite di sprite_object.py
 class Senjata(AnimatedSprite):
     def __init__(self, game, path='resources/sprites/weapon/shotgun/0.png', scale=0.3, animation_time=90):
         super().__init__(game=game, path=path, scale=scale, animation_time=animation_time)
@@ -13,6 +14,7 @@ class Senjata(AnimatedSprite):
         self.frame_counter = 0
         self.damage = 50
 
+    # Animasikan senjata
     def animate_shot(self):
         if self.reloading:
             self.game.pemain.shot = False
@@ -24,9 +26,11 @@ class Senjata(AnimatedSprite):
                     self.reloading = False
                     self.frame_counter = 0
 
+    # Gambarkan senjata
     def draw(self):
         self.game.screen.blit(self.images[0], self.weapon_pos)
 
+    # Perbarui kelas
     def update(self):
         self.check_animation_time()
         self.animate_shot()

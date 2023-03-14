@@ -3,7 +3,7 @@ from settings import *
 import os
 from collections import deque
 
-
+# Kelas untuk sprite selain dinding. Kelas ini adalah untuk sprite yang statik
 class ObjekSprite:
     def __init__(self, game, path='resources/sprites/static_sprites/lilin.png',
                  pos=(10.5, 3.5), scale=0.7, shift=0.27):
@@ -19,6 +19,7 @@ class ObjekSprite:
         self.SPRITE_SCALE = scale
         self.SPRITE_HEIGHT_SHIFT = shift
 
+    # Fungsi yang menaruh sprite di peta. Fungsi ini memanggil raycasting.py
     def get_sprite_projection(self):
         proj = JARAK_SCREEN / self.norm_dist * self.SPRITE_SCALE
         proj_width, proj_height = proj * self.IMAGE_RATIO, proj
@@ -31,6 +32,7 @@ class ObjekSprite:
 
         self.game.raycasting.objects_to_render.append((self.norm_dist, image, pos))
 
+    # Fungsi untuk mendapatkan sprite berdasarkan pandangan pemain
     def get_sprite(self):
         dx = self.x - self.player.x
         dy = self.y - self.player.y
@@ -49,10 +51,11 @@ class ObjekSprite:
         if -self.IMAGE_HALF_WIDTH < self.screen_x < (WIDTH + self.IMAGE_HALF_WIDTH) and self.norm_dist > 0.5:
             self.get_sprite_projection()
 
+    # Memperbarui kelas
     def update(self):
         self.get_sprite()
 
-
+# Kelas untuk sprite yang bergerak. Fungsi ini diturunkan dari kelas ObjekSprite
 class AnimatedSprite(ObjekSprite):
     def __init__(self, game, path='resources/sprites/animated_sprites/obor_merah/0.png',
                  pos=(11.5, 3.5), scale=0.8, shift=0.16, animation_time=120):
@@ -63,16 +66,19 @@ class AnimatedSprite(ObjekSprite):
         self.animation_time_prev = py.time.get_ticks()
         self.animation_trigger = False
 
+    # Mmemperbarui kelas
     def update(self):
         super().update()
         self.check_animation_time()
         self.animate(self.images)
 
+    # Fungsi untuk animasi sprite
     def animate(self, images):
         if self.animation_trigger:
             images.rotate(-1)
             self.image = images[0]
 
+    # Fungsi berapa lama animasi sprite
     def check_animation_time(self):
         self.animation_trigger = False
         time_now = py.time.get_ticks()
@@ -80,6 +86,7 @@ class AnimatedSprite(ObjekSprite):
             self.animation_time_prev = time_now
             self.animation_trigger = True
 
+    # Fungsi untuk mendapatkan gambar di path 
     def get_images(self, path):
         images = deque()
         for file_name in os.listdir(path):
